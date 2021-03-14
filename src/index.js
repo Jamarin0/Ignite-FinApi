@@ -142,4 +142,6 @@ app.get("/balance", verifyIfExistaccountCPF, (request, response) => {
     return response.json(balance);
 });
 
-app.listen(3333);
+app.listen(3333, () => {
+    console.log('Server starter on port 3333')
+});
