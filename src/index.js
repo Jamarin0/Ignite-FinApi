@@ -32,27 +32,6 @@ function getBalance(statement) {
     return balance;
 }
 
-app.post("/account", (request, response) => {
-    const { cpf, name } = request.body;
-
-    const customersAlreadyExists = customers.some(
-        (customer) => customer.cpf === cpf);
-
-    if (customersAlreadyExists) {
-        return response.status(400).json({ error: "customer already exists!" });
-    }
-
-    customers.push({
-        cpf,
-        name,
-        id: uuidv4(),
-        statement: []
-    });
-
-    return response.status(201).send();
-
-
-});
 
 app.get("/statement", verifyIfExistaccountCPF, (request, response) => {
     const { customer } = request;
@@ -112,6 +91,28 @@ app.post("/withdraw", verifyIfExistaccountCPF, (request, response) => {
 
 });
 
+app.post("/account", (request, response) => {
+    const { cpf, name } = request.body;
+
+    const customersAlreadyExists = customers.some(
+        (customer) => customer.cpf === cpf);
+
+    if (customersAlreadyExists) {
+        return response.status(400).json({ error: "customer already exists!" });
+    }
+
+    customers.push({
+        cpf,
+        name,
+        id: uuidv4(),
+        statement: []
+    });
+
+    return response.status(201).send();
+
+
+});
+
 app.put("/account", verifyIfExistaccountCPF, (request, response) =>{
     const {name} = request.body;
     const {customer} = request;
@@ -123,5 +124,22 @@ app.put("/account", verifyIfExistaccountCPF, (request, response) =>{
 app.get("/account",verifyIfExistaccountCPF, (request,response) =>{
     const {customer} = request;
     return response.json(customer);
-})
+});
+
+app.delete("/account", verifyIfExistaccountCPF, (request, response) => {
+    const {customer} = request;
+
+    customers.splice(customer, 1);
+
+    return response.status(200).json(customers);
+});
+
+app.get("/balance", verifyIfExistaccountCPF, (request, response) => {
+    const { customer } = request;
+
+    const balance = getBalance(customer.statement);
+
+    return response.json(balance);
+});
+
 app.listen(3333);
